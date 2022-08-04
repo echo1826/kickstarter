@@ -4,6 +4,19 @@ pragma solidity ^0.8.9;
 
 // linter warnings (red underline) about pragma version can igonored!
 
+contract CampaignFactory {
+    Campaign[] public deployedCampaigns;
+
+    function getCampaigns() public view returns (Campaign[] memory) {
+        return deployedCampaigns;
+    }
+
+    function createCampaign(uint256 minimum) public {
+        Campaign newCampaign = new Campaign(minimum, msg.sender);
+        deployedCampaigns.push(newCampaign);
+    }
+}
+
 contract Campaign {
     struct Request {
         string description;
@@ -21,8 +34,8 @@ contract Campaign {
     uint256 public approversCount;
     mapping(uint256 => Request) requests;
 
-    constructor(uint256 minContribution) {
-        manager = msg.sender;
+    constructor(uint256 minContribution, address managerAddress) {
+        manager = managerAddress;
         minimumContribution = minContribution;
     }
 
