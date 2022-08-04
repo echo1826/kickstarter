@@ -57,15 +57,6 @@ contract Campaign {
         uint256 value,
         address recipient
     ) public restricted {
-        // CANNOT CONSTRUCT A STRUCT WITH A NESTED MAPPING IN IT ANYMORE!!
-        // Request memory newRequest = Request({
-        //     description: description,
-        //     value: value,
-        //     recipient: recipient,
-        //     complete: false,
-        //     approvalCount: 0
-        // });
-
         Request storage request = requests[numRequests++];
         request.description = description;
         request.value = value;
