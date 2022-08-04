@@ -18,4 +18,8 @@ contract Campaign {
 
         approvers.push(msg.sender);
     }
+
+    function getApprovers() public view returns(address[] memory) {
+        return approvers;
+    }
 }
