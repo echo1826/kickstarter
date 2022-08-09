@@ -34,4 +34,6 @@ describe("Campaign Factory", () => {
         assert.ok(factory.options.address);
         assert.ok(campaign.options.address);
     });
+
+    it("")
 })
