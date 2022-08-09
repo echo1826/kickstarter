@@ -8,8 +8,6 @@ const compiledCampaign = require("../ethereum/build/Campaign.json");
 
 const web3 = new Web3(ganache.provider());
 
-
-
 let accounts;
 let factory;
 let campaignAddress;
@@ -22,11 +20,18 @@ beforeEach(async () => {
         .deploy({ data: compiledFactory.evm.bytecode.object })
         .send({ from: accounts[0], gas: "1500000" });
 
-    await factory.methods.createCampaign('100').send({from: accounts[0], gas: "1000000"});
+    await factory.methods
+        .createCampaign("100")
+        .send({ from: accounts[0], gas: "1000000" });
 
-    [campaignAddress] = await factory.methods.getCampaigns().call({from: accounts[0], gas: "1000000"});
+    [campaignAddress] = await factory.methods
+        .getCampaigns()
+        .call({ from: accounts[0], gas: "1000000" });
 
-    campaign = await new web3.eth.Contract(compiledCampaign.abi, campaignAddress);
+    campaign = await new web3.eth.Contract(
+        compiledCampaign.abi,
+        campaignAddress
+    );
 });
 
 describe("Campaign Factory", () => {
@@ -35,5 +40,44 @@ describe("Campaign Factory", () => {
         assert.ok(campaign.options.address);
     });
 
-    it("")
-})
+    it("marks caller as the campaign manager", async () => {
+        const manager = await campaign.methods.manager().call();
+        assert.equal(accounts[0], manager);
+    });
+
+    it("can contribute to a campaign and marks them as approvers", async () => {
+        await campaign.methods.contribute().send({
+            from: accounts[1],
+            value: "200",
+        });
+
+        const approverStatus = await campaign.methods
+            .approvers(accounts[1])
+            .call();
+        assert(approverStatus);
+    });
+
+    it("requires a minimum amount of contribution become a contributor", async () => {
+        try {
+            await campaign.methods.contribute().send({
+                from: accounts[1],
+                value: "100",
+            });
+            assert(false);
+        } catch (error) {
+            assert(error);
+        }
+    });
+
+    it("allows a manager to make a payment request", async () => {
+        await campaign.methods
+            .createRequest("Buy batteries", "100", accounts[1])
+            .send({
+                from: accounts[0],
+                gas: '1000000'
+            });
+        const request = await campaign.methods.requests(0).call();
+
+        assert.equal("Buy batteries", request.description);
+    });
+});

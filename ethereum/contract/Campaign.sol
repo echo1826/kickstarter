@@ -28,11 +28,11 @@ contract Campaign {
     }
 
     address public manager;
-    uint256 numRequests;
-    mapping(address => bool) approvers;
+    uint256 public numRequests;
+    mapping(address => bool) public approvers;
     uint256 public minimumContribution;
     uint256 public approversCount;
-    mapping(uint256 => Request) requests;
+    mapping(uint256 => Request) public requests;
 
     constructor(uint256 minContribution, address managerAddress) {
         manager = managerAddress;
